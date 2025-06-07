@@ -6,44 +6,56 @@
 using namespace cv;
 using namespace std;
 
-vector<Vec3f> detect_green_circles(const Mat& img) {
-    vector<Vec3f> circles;
-    if (img.empty()) return circles;
+vector<Rect> detect_green_objects(const Mat& frame) {
+    vector<Rect> greenRects;
+    if (frame.empty()) return greenRects;
 
-    // 转换为HSV色彩空间进行颜色分割
-    Mat hsv, mask;
-    cvtColor(img, hsv, COLOR_BGR2HSV);
+    // 直接RGB颜色过滤 - 更高效
+    Mat greenMask(frame.size(), CV_8UC1, Scalar(0));
     
-    // 定义绿色范围 (H:35-85, S>50, V>50)
-    Scalar lower_green(35, 50, 50);
-    Scalar upper_green(85, 255, 255);
-    inRange(hsv, lower_green, upper_green, mask);
+    // 并行处理每个像素
+    for (int y = 0; y < frame.rows; y++) {
+        for (int x = 0; x < frame.cols; x++) {
+            Vec3b pixel = frame.at<Vec3b>(y, x);
+            uchar b = pixel[0], g = pixel[1], r = pixel[2];
+            
+            // 绿色检测条件：绿色通道占主导
+            bool isGreen = (g > r * 1.3) && (g > b * 1.3) && (g > 50);
+            greenMask.at<uchar>(y, x) = isGreen ? 255 : 0;
+        }
+    }
 
-    // 形态学优化（可选）
-    // Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(5,5));
-    // morphologyEx(mask, mask, MORPH_OPEN, kernel);
+    // 查找连通区域
+    vector<vector<Point>> contours;
+    findContours(greenMask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    
+    // 筛选圆形区域
+    for (const auto& contour : contours) {
+        double area = contourArea(contour);
+        if (area < 100) continue; // 忽略小区域
+        
+        // 使用最小外接圆判断圆形度
+        Point2f center;
+        float radius;
+        minEnclosingCircle(contour, center, radius);
+        
+        double circleArea = CV_PI * radius * radius;
+        double circularity = area / circleArea;
+        
+        // 圆形度阈值 (0.7-0.9)
+        if (circularity > 0.75) {
+            Rect bbox = boundingRect(contour);
+            greenRects.push_back(bbox);
+        }
+    }
 
-    // 高斯模糊降噪
-    Mat blurred;
-    GaussianBlur(mask, blurred, Size(9,9), 2, 2);
-
-    // 霍夫圆检测
-    HoughCircles(blurred, circles, HOUGH_GRADIENT, 
-                 1,   // 图像尺度
-                 30,  // 圆心最小间距
-                 100, // Canny高阈值
-                 20,  // 累加器阈值
-                 5,   // 最小半径
-                 50   // 最大半径
-    );
-
-    return circles;
+    return greenRects;
 }
 
 int main() {
     cv::VideoCapture cap(0);
     if (!cap.isOpened()) {
-        std::cerr << "error" << std::endl;
+        std::cerr << "无法打开摄像头!" << std::endl;
         return -1;
     }
 
@@ -53,8 +65,7 @@ int main() {
     
     int frameCount = 0;
     double fps = 0;
-    auto startTime = std::chrono::high_resolution_clock::now();
-    auto lastPrintTime = startTime;
+    auto lastPrintTime = std::chrono::high_resolution_clock::now();
     
     // 跳过前几帧让摄像头稳定
     for (int i = 0; i < 5; ++i) {
@@ -65,19 +76,20 @@ int main() {
         cap >> frame;
         if (frame.empty()) break;
         
-        // 检测绿色圆形
+        // 检测绿色圆形对象
         auto startDetect = std::chrono::high_resolution_clock::now();
-        vector<Vec3f> green_circles = detect_green_circles(frame);
+        vector<Rect> greenObjects = detect_green_objects(frame);
         auto endDetect = std::chrono::high_resolution_clock::now();
         
         // 绘制检测结果
-        for (const Vec3f& c : green_circles) {
-            Point center(cvRound(c[0]), cvRound(c[1]));
-            int radius = cvRound(c[2]);
-            // 绘制圆形轮廓
-            circle(frame, center, radius, Scalar(0,255,0), 3);
-            // 绘制圆心
-            circle(frame, center, 3, Scalar(0,0,255), -1);
+        for (const Rect& rect : greenObjects) {
+            // 绘制边界框
+            rectangle(frame, rect, Scalar(0, 255, 0), 2);
+            
+            // 绘制圆形标记
+            Point center(rect.x + rect.width/2, rect.y + rect.height/2);
+            int radius = min(rect.width, rect.height)/2;
+            circle(frame, center, radius, Scalar(0, 0, 255), 2);
         }
         
         frameCount++;
@@ -94,17 +106,16 @@ int main() {
         // 计算检测耗时
         auto detectTime = std::chrono::duration_cast<std::chrono::milliseconds>(endDetect - startDetect).count();
         
-        // 显示FPS和检测时间
+        // 显示性能信息
         std::string fpsText = "FPS: " + std::to_string(static_cast<int>(fps));
         std::string detectText = "Detect: " + std::to_string(detectTime) + "ms";
-        cv::putText(frame, fpsText, cv::Point(10, 30), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
-        cv::putText(frame, detectText, cv::Point(10, 60), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 255, 255), 2);
+        std::string countText = "Objects: " + std::to_string(greenObjects.size());
         
-        // 显示检测到的圆形数量
-        std::string countText = "Circles: " + std::to_string(green_circles.size());
-        cv::putText(frame, countText, cv::Point(10, 90), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(255, 0, 0), 2);
+        cv::putText(frame, fpsText, Point(10, 30), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 0), 2);
+        cv::putText(frame, detectText, Point(10, 60), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(0, 255, 255), 2);
+        cv::putText(frame, countText, Point(10, 90), FONT_HERSHEY_SIMPLEX, 0.7, Scalar(255, 0, 0), 2);
         
-        cv::imshow("Green Circle Detection", frame);
+        cv::imshow("Green Circle Detection (Color Only)", frame);
         
         // 按ESC退出
         if (cv::waitKey(10) == 27) break; 
