@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(dart001)
 
+set(raspicam_DIR "/usr/local/lib/cmake")
+
 find_package(raspicam REQUIRED)
 find_package(OpenCV)
 
