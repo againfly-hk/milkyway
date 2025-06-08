@@ -61,7 +61,7 @@ int main() {
     raspicam::RaspiCam_Cv cap;
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);   // 320x240可进一步提高帧率
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
-    cap.set(cv::CAP_PROP_FPS, 30);           // 尝试设置30FPS
+    cap.set(cv::CAP_PROP_FPS, 120);           // 尝试设置30FPS
     cap.set(cv::CAP_PROP_FORMAT, CV_8UC3);    // BGR格式
     
     if (!cap.open()) {
