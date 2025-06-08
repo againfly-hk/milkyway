@@ -19,3 +19,8 @@ cmake ..
 sudo make install
 sudo ldconfig
 
+# 安装实时补丁
+
+# opencv优化策略
+# 1、安装实时补丁；
+# 2、

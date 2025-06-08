@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
-project(CameraDisplay)
+project(dart001)
 
 find_package(raspicam REQUIRED)
 find_package(OpenCV)
 
-IF  ( OpenCV_FOUND AND raspicam_CV_FOUND)
+IF(OpenCV_FOUND AND raspicam_CV_FOUND)
 MESSAGE(STATUS "COMPILING OPENCV TESTS")
-add_executable (simpletest_raspicam_cv simpletest_raspicam_cv.cpp)  
-target_link_libraries (simpletest_raspicam_cv ${raspicam_CV_LIBS})
+add_executable(dart001 dart001.cpp)  
+target_link_libraries(dart001 ${raspicam_CV_LIBS})
 ELSE()
 MESSAGE(FATAL_ERROR "OPENCV NOT FOUND IN YOUR SYSTEM")
 ENDIF()
