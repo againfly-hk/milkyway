@@ -24,24 +24,23 @@ int main() {
     camera.set(cv::CAP_PROP_GAIN, 50);            // 增益 (0-100)
     camera.set(cv::CAP_PROP_SHARPNESS, 0);        // 锐度 (0-100)
 
-    if (!cap.open()) {
+    if (!camera.open()) {
         std::cerr << "无法打开树莓派摄像头!" << std::endl;
         return -1;
     }
 
-    // 显示当前参数设置
-    cout << "\n当前摄像头参数设置:" << endl;
-    cout << "宽度: " << camera.get(cv::CAP_PROP_FRAME_WIDTH) << endl;
-    cout << "高度: " << camera.get(cv::CAP_PROP_FRAME_HEIGHT) << endl;
-    cout << "帧率: " << camera.get(cv::CAP_PROP_FPS) << endl;
-    cout << "格式: " << camera.get(cv::CAP_PROP_FORMAT) << endl;
-    cout << "曝光: " << camera.get(cv::CAP_PROP_EXPOSURE) << endl;
-    cout << "白平衡: " << camera.get(cv::CAP_PROP_WB_TEMPERATURE) << endl;
-    cout << "亮度: " << camera.get(cv::CAP_PROP_BRIGHTNESS) << endl;
-    cout << "对比度: " << camera.get(cv::CAP_PROP_CONTRAST) << endl;
-    cout << "饱和度: " << camera.get(cv::CAP_PROP_SATURATION) << endl;
-    cout << "增益: " << camera.get(cv::CAP_PROP_GAIN) << endl;
-    cout << "锐度: " << camera.get(cv::CAP_PROP_SHARPNESS) << endl;
+    std::cout << "\n当前摄像头参数设置:" << std::endl;
+    std::cout << "宽度: " << camera.get(cv::CAP_PROP_FRAME_WIDTH) << std::endl;
+    std::cout << "高度: " << camera.get(cv::CAP_PROP_FRAME_HEIGHT) << std::endl;
+    std::cout << "帧率: " << camera.get(cv::CAP_PROP_FPS) << std::endl;
+    std::cout << "格式: " << camera.get(cv::CAP_PROP_FORMAT) << std::endl;
+    std::cout << "曝光: " << camera.get(cv::CAP_PROP_EXPOSURE) << std::endl;
+    std::cout << "白平衡: " << camera.get(cv::CAP_PROP_WB_TEMPERATURE) << std::endl;
+    std::cout << "亮度: " << camera.get(cv::CAP_PROP_BRIGHTNESS) << std::endl;
+    std::cout << "对比度: " << camera.get(cv::CAP_PROP_CONTRAST) << std::endl;
+    std::cout << "饱和度: " << camera.get(cv::CAP_PROP_SATURATION) << std::endl;
+    std::cout << "增益: " << camera.get(cv::CAP_PROP_GAIN) << std::endl;
+    std::cout << "锐度: " << camera.get(cv::CAP_PROP_SHARPNESS) << std::endl;
 
     int frameCount = 0;
     int fps = 0;
@@ -50,8 +49,8 @@ int main() {
     while (true) {
         auto start = std::chrono::high_resolution_clock::now();
         
-        cap.grab();
-        cap.retrieve(frame);
+        camera.grab();
+        camera.retrieve(frame);
         if (frame.empty()) {
             std::cerr << "获取帧失败!" << std::endl;
             break;
@@ -65,14 +64,14 @@ int main() {
             frameCount = 0;
             lastPrintTime = currentTime;
             
-            std::cout << "FPS: " << fps std::endl;
+            std::cout << "FPS: " << fps << std::endl;
         }
         
-        cv::imshow("RPi Green Circle Detection", frame);
+        cv::imshow("RPi Camera Feed", frame);
         if (cv::waitKey(1) == 27) break; 
     }
 
-    cap.release();
+    camera.release();
     cv::destroyAllWindows();
     return 0;
 }
