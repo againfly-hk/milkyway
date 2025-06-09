@@ -5,15 +5,15 @@
 
 const uchar GREEN_THRESHOLD = 200;   // 绿色通道阈值 (0-255)
 const uchar MIN_RB_DIFF = 100;       // G与R/B的最小差值
-const int MIN_AREA = 10;             // 最小区域面积 (像素)
+const int MIN_AREA = 1;             // 最小区域面积 (像素)
 
 int main() {
     raspicam::RaspiCam_Cv camera;
     cv::Mat frame;
 
     camera.set(cv::CAP_PROP_FORMAT, CV_8UC3);    // 设置图像格式为BGR
-    camera.set(cv::CAP_PROP_FRAME_WIDTH, 640);   // 宽度
-    camera.set(cv::CAP_PROP_FRAME_HEIGHT, 480);  // 高度
+    camera.set(cv::CAP_PROP_FRAME_WIDTH, 320);   // 宽度
+    camera.set(cv::CAP_PROP_FRAME_HEIGHT, 240);  // 高度
     camera.set(cv::CAP_PROP_FPS, 120);            // 帧率
 
     camera.set(cv::CAP_PROP_AUTO_EXPOSURE, 1);    // 手动曝光 (1=手动, 0=自动)
@@ -51,7 +51,7 @@ int main() {
     auto lastPrintTime = std::chrono::high_resolution_clock::now();
     
     cv::Mat channels[3];
-    cv::Mat mask(480, 640, CV_8UC1);
+    cv::Mat mask(240, 320, CV_8UC1);
     std::vector<std::vector<cv::Point>> contours;
 
     while (true) {
