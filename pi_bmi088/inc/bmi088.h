@@ -57,5 +57,6 @@ private:
 
     void bmi088SleepMs(unsigned int ms);
     void bmi088SleepUs(unsigned int us);
+};
 
 #endif

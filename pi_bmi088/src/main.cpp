@@ -23,7 +23,7 @@ int main() {
         // std::cout << "Accel: (" << raw_data.accel_x << ", " << raw_data.accel_y << ", " << raw_data.accel_z << ") "
         //           << "Gyro: (" << raw_data.gyro_x << ", " << raw_data.gyro_y << ", " << raw_data.gyro_z << ") "
         //           << "Temp: " << raw_data.temperature << std::endl;
-        // usleep(10000); 
+        usleep(10000); 
     }
 
     return 0;
