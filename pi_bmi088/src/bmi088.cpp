@@ -5,9 +5,10 @@
 #include <pigpio.h>
 #include <stdexcept>
 #include <unistd.h>
+#include <iostream>
 
 double bmi088_accel_sen = BMI088_ACCEL_12G_SEN;
-double bmi088_gyro_sen = BMI088_GYRO_2000DPS_SEN;
+double bmi088_gyro_sen = BMI088_GYRO_2000_SEN;
 
 BMI088::BMI088() {
     // initialize pigpio library
@@ -124,11 +125,11 @@ BMI088::~BMI088() {
 }
 
 uint8_t BMI088::readAccel(void) {
-    uint8_t buff[6] = {0};
-    readAccelMultiRegister(BMI088_ACCEL_XOUT_L, buff, 6);
-    raw_data.accel_x = (int16_t)((buff[1] << 8) | buff[0]);
-    raw_data.accel_y = (int16_t)((buff[3] << 8) | buff[2]);
-    raw_data.accel_z = (int16_t)((buff[5] << 8) | buff[4]);
+    uint8_t buf[6] = {0};
+    readAccelMultiRegister(BMI088_ACCEL_XOUT_L, buf, 6);
+    raw_data.accel_x = (int16_t)((buf[1] << 8) | buf[0]);
+    raw_data.accel_y = (int16_t)((buf[3] << 8) | buf[2]);
+    raw_data.accel_z = (int16_t)((buf[5] << 8) | buf[4]);
 
     real_data.accel_x = raw_data.accel_x * bmi088_accel_sen;
     real_data.accel_y = raw_data.accel_y * bmi088_accel_sen;
@@ -138,11 +139,11 @@ uint8_t BMI088::readAccel(void) {
 }
 
 uint8_t BMI088::readGyro(void) {
-    uint8_t buff[6] = {0};
-    readGyroMultiRegister(BMI088_GYRO_X_L, buff, 6);
-    raw_data.gyro_x = (int16_t)((buff[1] << 8) | buff[0]);
-    raw_data.gyro_y = (int16_t)((buff[3] << 8) | buff[2]);
-    raw_data.gyro_z = (int16_t)((buff[5] << 8) | buff[4]);
+    uint8_t buf[6] = {0};
+    readGyroMultiRegister(BMI088_GYRO_X_L, buf, 6);
+    raw_data.gyro_x = (int16_t)((buf[1] << 8) | buf[0]);
+    raw_data.gyro_y = (int16_t)((buf[3] << 8) | buf[2]);
+    raw_data.gyro_z = (int16_t)((buf[5] << 8) | buf[4]);
 
     real_data.gyro_x = raw_data.gyro_x * bmi088_gyro_sen;
     real_data.gyro_y = raw_data.gyro_y * bmi088_gyro_sen;
@@ -152,9 +153,9 @@ uint8_t BMI088::readGyro(void) {
 }
 
 uint8_t BMI088::readTempture(void) {
-    uint8_t buff[2] = {0};
-    readAccelMultiRegister(BMI088_ACC_TEMP, buff, 2);
-    raw_data.temperature = (int16_t)((buff[1] << 3) | (buff[0] >> 5));
+    uint8_t buf[2] = {0};
+    readAccelMultiRegister(BMI088_TEMP_M, buf, 2);
+    raw_data.temperature = (int16_t)((buf[1] << 3) | (buf[0] >> 5));
 
     if(raw_data.temperature > 1023) {
         raw_data.temperature -= 2048;
@@ -379,8 +380,8 @@ uint8_t BMI088::writeRegister(int csPin, uint8_t reg, uint8_t cmd) {
 }
 
 uint8_t BMI088::readMultiRegister(int csPin, uint8_t reg, uint8_t *bufp, uint8_t len) {
-    uint8_t tx[len + 1];
-    uint8_t rx[len + 1];
+    uint8_t tx[6 + 1];
+    uint8_t rx[6 + 1];
 
     tx[0] = (reg | 0x80);
     for (int i = 1; i <= len; i++) {
