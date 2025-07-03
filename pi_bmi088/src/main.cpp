@@ -1,5 +1,6 @@
 #include "bmi088.h"
 #include <iostream>
+#include <unistd.h>
 
 int main() {
     // try {
@@ -15,14 +16,14 @@ int main() {
         imu.readGyro();
         imu.readTempture();
 
-        // 打印数据log
-        const auto& raw_data = imu.getRawData();
-        const auto& real_data = imu.getRealData();
-        std::cout << "Raw Data: ";
-        std::cout << "Accel: (" << raw_data.accel_x << ", " << raw_data.accel_y << ", " << raw_data.accel_z << ") "
-                  << "Gyro: (" << raw_data.gyro_x << ", " << raw_data.gyro_y << ", " << raw_data.gyro_z << ") "
-                  << "Temp: " << raw_data.temperature << std::endl;
-        usleep(10000); 
+        // // 打印数据log
+        // const auto& raw_data = imu.getRawData();
+        // const auto& real_data = imu.getRealData();
+        // std::cout << "Raw Data: ";
+        // std::cout << "Accel: (" << raw_data.accel_x << ", " << raw_data.accel_y << ", " << raw_data.accel_z << ") "
+        //           << "Gyro: (" << raw_data.gyro_x << ", " << raw_data.gyro_y << ", " << raw_data.gyro_z << ") "
+        //           << "Temp: " << raw_data.temperature << std::endl;
+        // usleep(10000); 
     }
 
     return 0;

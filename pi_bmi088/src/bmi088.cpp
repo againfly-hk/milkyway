@@ -13,6 +13,10 @@ BMI088::BMI088() {
     // initialize pigpio library
     if (gpioInitialise() < 0)  throw std::runtime_error("pigpio initialization failed");
 
+    // set CS pins
+    csGyro = 7;
+    csAccel = 8;
+
     // configure CS pins
     gpioSetMode(csGyro, PI_OUTPUT);
     gpioSetMode(csAccel, PI_OUTPUT);

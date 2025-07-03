@@ -45,8 +45,8 @@ public:
 
 private:
     int spiHandle;
-    const int csGyro = 7;
-    const int csAccel = 8;
+    int csGyro;
+    int csAccel;
 
     bmi088_raw_data_t raw_data;
     bmi088_real_data_t real_data;
