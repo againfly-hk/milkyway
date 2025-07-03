@@ -28,6 +28,13 @@ public:
     uint8_t readGyroRegister(uint8_t reg);
     uint8_t writeGyroRegister(uint8_t reg, uint8_t cmd);
 
+    uint8_t readAccelMultiRegister(uint8_t reg, uint8_t *bufp, uint8_t len);
+    uint8_t readGyroMultiRegister(uint8_t reg, uint8_t *bufp, uint8_t len);
+
+    uint8_t readAccel(void);
+    uint8_t readGyro(void);
+    uint8_t readTempture(void);
+
     uint8_t accelInit(void);
     uint8_t gyroInit(void);
     uint8_t accelSelfTest(void);
@@ -44,13 +51,11 @@ private:
     bmi088_raw_data_t raw_data;
     bmi088_real_data_t real_data;
 
-    uint8_t readAccelMultiRegister(uint8_t reg, uint8_t *bufp, uint8_t len);
-
     uint8_t readRegister(int csPin, uint8_t reg);
     uint8_t writeRegister(int csPin, uint8_t reg, uint8_t cmd);
+    uint8_t readMultiRegister(int csPin, uint8_t reg, uint8_t *bufp, uint8_t len);
 
     void bmi088SleepMs(unsigned int ms);
     void bmi088SleepUs(unsigned int us);
-};
 
 #endif
