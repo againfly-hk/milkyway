@@ -2,12 +2,13 @@
 #include <iostream>
 
 int main() {
-    try {
-        BMI088 imu;
-    } catch (const std::exception& e) {
-        std::cerr << "[ERROR] " << e.what() << std::endl;
-        return 1;
-    }
+    // try {
+    //     BMI088 imu;
+    // } catch (const std::exception& e) {
+    //     std::cerr << "[ERROR] " << e.what() << std::endl;
+    //     return 1;
+    // }
+    BMI088 imu;
 
     while(1) {
         imu.readAccel();
