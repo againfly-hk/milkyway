@@ -19,23 +19,9 @@ cmake ..
 sudo make install
 sudo ldconfig
 
-# 安装实时补丁
+# 安装 pigpio
 sudo apt update
-sudo apt upgrade
+sudo apt install pigpio
 
-# 安装编译内核所需的环境
-sudo apt install git bc bison flex libssl-dev make
-sudo apt install libncurses5-dev
-sudo apt install raspberrypi-kernel-headers
-
-cd ~/linux
-head -n 10 Makefile
-
-xz -d patch-6.1.77-rt24.patch.xz
-
-patch -p1 < ~/kernel/patch-6.1.77-rt24.patch
-
-
-# opencv优化策略
-# 1、安装实时补丁；
-# 2、
+# 启动 pigpio 守护进程
+sudo pigpiod
